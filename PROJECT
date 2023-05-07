@@ -1,0 +1,101 @@
+Problem Statement - Inventory Control Management helps to identify which and how much stock to order at what time. It tracks inventory from purchase to the sale of goods. Create this project with the help of  the following specifications:
+
+Create a database called “Inventory_Management” with different tables like “manufacture”, “goods”, “purchase”, “sale” etc.
+
+
+
+coonection.py:
+
+import mysql.connector
+mydb=mysql.connector.connect(host="localhost",user="root",password="Pooja@123")
+print(mydb.connection_id)
+
+creating_db.py:
+
+import mysql.connector
+mydb=mysql.connector.connect(host="localhost",user="root",password="Pooja@123")
+cur=mydb.cursor()
+cur.execute("create database Inventory_Management")
+
+
+create_table.py:
+
+import mysql.connector
+mydb=mysql.connector.connect(host="localhost",user="root",password="Pooja@123",database="Inventory_Management")
+cur=mydb.cursor()
+t="create table manufacture(manufacture_id integer(4) primary key,product varchar(15),number_of_items int,manufacture_date date,no_of_defectives int)"
+cur.execute(t)
+s="create table goods(goods_id int primary key not null,product varchar(20),company varchar(25),manufacture_date date)"
+cur.execute(s)
+x="create table purchase(purchase_id int primary key not null,purchase_amount int ,store varchar(20),product varchar(20),manufacture_date date)"
+cur.execute(x)
+y="create table sale (sale_date date ,sales_amount int ,product varchar(20),store varchar(20))"
+cur.execute(y)
+
+
+insert_data.py:
+
+import mysql.connector
+mydb=mysql.connector.connect(host="localhost",user="root",password="Pooja@123",database="Inventory_Management")
+cur=mydb.cursor()
+x="insert into manufacture (manufacture_id,product,number_of_items,manufacture_date,no_of_defectives)values(%s,%s,%s,%s,%s)"
+a=[(1001,"shirt",5,"23-04-01",1),(1002,"red-colourtoys",6,"23-06-01",0),(1003,"wooden_chair",6,"23-04-01",0),(1004,"wooden_table",5,"23-04-05",0)]
+cur.executemany(x,a)
+mydb.commit()
+y="insert into goods(goods_id ,product,company,manufacture_date)values(%s,%s,%s,%s)"
+b=[(2001,"shirt","AA export","23-04-01"),(2002,"red-colourtoys","BB export","23-06-01"),(2003,"wooden_chair","CC export","23-04-01"),(2004,"wooden_table","XX export","23-04-05")]
+cur.executemany(y,b)
+mydb.commit()
+z="insert into purchase(purchase_id,purchase_amount,store,product,manufacture_date)values(%s,%s,%s,%s,%s)"
+c=[(3001,1000,"ORay","shirt","23-04-01"),(3002,2000,"MyKids","red-colourtoys","23-06-01"),(3003,3000,"MyChair","wooden_chair","23-04-01"),(3004,4000,"MyCare","wooden_table","23-04-05")]
+cur.executemany(z,c)
+mydb.commit()
+i="insert into sale(sale_date,sales_amount,product,store)values(%s,%s,%s,%s)"
+j=[("23-05-06",2000,"shirt","ORay"),("23-06-07",4000,"red-colourtoys","MyKids"),("23-06-04",5000,"wooden_chair","MyChair"),("23-07-02",5000,"wooden_table","MyCare")]
+cur.executemany(i,j)
+mydb.commit()
+
+
+Delete the defective item, e.g., the shirt which was accidentally purchased by the “ORay” store, manufactured on the date ‘01-04-23’.
+
+
+import mysql.connector
+mydb=mysql.connector.connect(host="localhost",user="root",password="Pooja@123",database="Inventory_Management")
+cur=mydb.cursor()
+f="delete from purchase where product='shirt' and store='ORay' and manufacture_date='23,04,01'"
+cur.execute(f)
+mydb.commit()
+
+
+Update the manufacture details of all the red-colored toys which are purchased by the “MyKids” store.
+
+import mysql.connector
+mydb=mysql.connector.connect(host="localhost",user="root",password="Pooja@123",database="Inventory_Management")
+cur=mydb.cursor()
+f="update manufacture set number_of_items=number_of_items+2 where product='red-colourtoys' and manufacture_date in(select manufacture_date from purchase where store='MyKids')"  
+cur.execute(f)
+mydb.commit()
+
+
+
+Display all the “wooden chair” items that were manufactured before the 1st May 2023.
+
+ 
+import mysql.connector
+mydb=mysql.connector.connect(host="localhost",user="root",password="Pooja@123",database="Inventory_Management")
+cur=mydb.cursor()
+f="select * from goods where product='wooden_chair' and manufacture_date<'23-05-01'"
+cur.execute(f)
+mydb.commit()
+
+
+Display the profit margin amount of the “wooden table” that was sold by the “MyCare” store, manufactured by the “SS Export” company.
+
+import mysql.connector
+mydb=mysql.connector.connect(host="localhost",user="root",password="Pooja@123",database="Inventory_Management")
+cur=mydb.cursor()
+f="select sales_amount-purchase_amount as profit from goods g join purchase p on g.product=p.product join sale s on p.product=s.product where s.product='wooden_chair' and p.store='MyStore' and g.company='SS export' " 
+cur.execute(f)
+mydb.commit()
+
+
